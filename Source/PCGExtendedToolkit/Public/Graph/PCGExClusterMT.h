@@ -41,6 +41,8 @@ namespace PCGExClusterMT
 
 #pragma endregion
 
+	class FClusterProcessorBatchBase; 
+	
 	class FClusterProcessor
 	{
 		friend class FClusterProcessorBatchBase;
@@ -56,9 +58,6 @@ namespace PCGExClusterMT
 		bool bInlineProcessNodes = false;
 		bool bInlineProcessEdges = false;
 		bool bInlineProcessRange = false;
-
-		template <typename T>
-		T* GetParentBatch() { return static_cast<T*>(ParentBatch); }
 
 		int32 NumNodes = 0;
 		int32 NumEdges = 0;
@@ -78,7 +77,10 @@ namespace PCGExClusterMT
 		}
 
 	public:
-		FClusterProcessorBatchBase* ParentBatch = nullptr;
+		PCGExClusterMT::FClusterProcessorBatchBase* ParentBatch = nullptr;
+		
+		template <typename T>
+		T* GetParentBatch() { return static_cast<T*>(ParentBatch); }
 
 		PCGExData::FFacade* VtxDataFacade = nullptr;
 		PCGExData::FFacade* EdgeDataFacade = nullptr;

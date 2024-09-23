@@ -30,17 +30,17 @@ PCGExData::EInit UPCGExFindContoursSettings::GetMainOutputInitMode() const { ret
 
 bool FPCGExFindContoursContext::TryFindContours(PCGExData::FPointIO* PathIO, const int32 SeedIndex, PCGExFindContours::FProcessor* ClusterProcessor)
 {
-	const UPCGExFindContoursSettings* Settings = ClusterProcessor->LocalSettings;
+	const UPCGExFindContoursSettings* Settings = ClusterProcessor->GetLocalSettings();
 
 	PCGExCluster::FCluster* Cluster = ClusterProcessor->Cluster;
 
-	TArray<PCGExCluster::FExpandedNode*>* ExpandedNodes = ClusterProcessor->ExpandedNodes;
-	TArray<PCGExCluster::FExpandedEdge*>* ExpandedEdges = ClusterProcessor->ExpandedEdges;
+	TArray<PCGExCluster::FExpandedNode*>* ExpandedNodes = ClusterProcessor->GetExpandedNodes();
+	TArray<PCGExCluster::FExpandedEdge*>* ExpandedEdges = ClusterProcessor->GetExpandedEdges();
 
-	const TArray<FVector>& Positions = *ClusterProcessor->ProjectedPositions;
+	const TArray<FVector>& Positions = *ClusterProcessor->GetProjectedPositions();
 	const TArray<PCGExCluster::FNode>& NodesRef = *Cluster->Nodes;
 
-	const FVector Guide = ClusterProcessor->LocalTypedContext->ProjectionDetails.Project(ClusterProcessor->LocalTypedContext->SeedsDataFacade->Source->GetInPoint(SeedIndex).Transform.GetLocation(), SeedIndex);
+	const FVector Guide = ClusterProcessor->GetLocalTypedContext()->ProjectionDetails.Project(ClusterProcessor->GetLocalTypedContext()->SeedsDataFacade->Source->GetInPoint(SeedIndex).Transform.GetLocation(), SeedIndex);
 	int32 StartNodeIndex = Cluster->FindClosestNode(Guide, Settings->SeedPicking.PickingMethod, 2);
 	int32 NextEdge = Cluster->FindClosestEdge(StartNodeIndex, Guide);
 
@@ -86,8 +86,8 @@ bool FPCGExFindContoursContext::TryFindContours(PCGExData::FPointIO* PathIO, con
 		uint64 StartHash = PCGEx::H64(PrevIndex, NextIndex);
 		bool bAlreadyExists;
 		{
-			FWriteScopeLock WriteScopeLock(ClusterProcessor->UniquePathsLock);
-			ClusterProcessor->UniquePathsStartPairs.Add(StartHash, &bAlreadyExists);
+			FWriteScopeLock WriteScopeLock(ClusterProcessor->GetUniquePathsLock());
+			ClusterProcessor->GetUniquePathsStartPairs().Add(StartHash, &bAlreadyExists);
 		}
 		if (bAlreadyExists) { return false; }
 	}
@@ -195,8 +195,8 @@ bool FPCGExFindContoursContext::TryFindContours(PCGExData::FPointIO* PathIO, con
 		uint32 BoxHash = HashCombineFast(GetTypeHash(PathBox.Min), GetTypeHash(PathBox.Max));
 		bool bAlreadyExists;
 		{
-			FWriteScopeLock WriteScopeLock(ClusterProcessor->UniquePathsLock);
-			ClusterProcessor->UniquePathsBounds.Add(BoxHash, &bAlreadyExists);
+			FWriteScopeLock WriteScopeLock(ClusterProcessor->GetUniquePathsLock());
+			ClusterProcessor->GetUniquePathsBounds().Add(BoxHash, &bAlreadyExists);
 		}
 		if (bAlreadyExists) { return false; }
 	}
@@ -223,7 +223,7 @@ bool FPCGExFindContoursContext::TryFindContours(PCGExData::FPointIO* PathIO, con
 		PCGEx::TAttributeWriter<bool>* DeadEndWriter = new PCGEx::TAttributeWriter<bool>(Settings->DeadEndAttributeName, false, false, true);
 		DeadEndWriter->BindAndSetNumUninitialized(PathIO);
 		for (int i = 0; i < Path.Num(); ++i) { DeadEndWriter->Values[i] = (Cluster->Nodes->GetData() + Path[i])->Adjacency.Num() == 1; }
-		PCGEX_ASYNC_WRITE_DELETE(ClusterProcessor->AsyncManagerPtr, DeadEndWriter)
+		PCGEX_ASYNC_WRITE_DELETE(ClusterProcessor->GetAsyncManagerPtr(), DeadEndWriter)
 	}
 
 	if (Sign != 0)
@@ -232,10 +232,10 @@ bool FPCGExFindContoursContext::TryFindContours(PCGExData::FPointIO* PathIO, con
 		if (Settings->bTagConvex && bIsConvex) { PathIO->Tags->Add(Settings->ConvexTag); }
 	}
 
-	PathDataFacade->Write(ClusterProcessor->AsyncManagerPtr, true);
+	PathDataFacade->Write(ClusterProcessor->GetAsyncManagerPtr(), true);
 	PCGEX_DELETE(PathDataFacade)
 
-	if (Settings->bOutputFilteredSeeds) { ClusterProcessor->LocalTypedContext->SeedQuality[SeedIndex] = true; }
+	if (Settings->bOutputFilteredSeeds) { ClusterProcessor->GetLocalTypedContext()->SeedQuality[SeedIndex] = true; }
 
 	return true;
 }

@@ -239,6 +239,9 @@ namespace PCGExSampleOverlapStats
 	public:
 		FOverlapStats Stats;
 
+		double GetLocalOverlapSubCountMax() const { return LocalOverlapSubCountMax; }
+		double GetLocalOverlapCountMax() const { return LocalOverlapCountMax; }
+
 		explicit FProcessor(PCGExData::FPointIO* InPoints)
 			: FPointsProcessor(InPoints)
 		{

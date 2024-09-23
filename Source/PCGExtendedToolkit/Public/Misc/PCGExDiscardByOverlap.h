@@ -372,6 +372,11 @@ namespace PCGExDiscardByOverlap
 		virtual void CompleteWork() override;
 		virtual void Write() override;
 
+		void UpdateWeightGetter(const FPCGExOverlapScoresWeighting& InMax) 
+		{ 
+			UpdateWeight(InMax); 
+		}
+
 	protected:
 		void UpdateWeightValues();
 		void UpdateWeight(const FPCGExOverlapScoresWeighting& InMax);

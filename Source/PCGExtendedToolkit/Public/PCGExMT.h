@@ -401,7 +401,7 @@ namespace PCGExMT
 		void OnTaskCompleted();
 	};
 
-	class /*PCGEXTENDEDTOOLKIT_API*/ PCGExMT::FPCGExTask : public FNonAbandonableTask
+	class /*PCGEXTENDEDTOOLKIT_API*/ FPCGExTask : public FNonAbandonableTask
 	{
 		friend class FTaskManager;
 		friend class FTaskGroup;
@@ -425,7 +425,7 @@ namespace PCGExMT
 #define PCGEX_ASYNC_CHECKPOINT_VOID  if (!Checkpoint()) { return; }
 #define PCGEX_ASYNC_CHECKPOINT  if (!Checkpoint()) { return false; }
 
-		PCGExMT::FPCGExTask(PCGExData::FPointIO* InPointIO) : PointIO(InPointIO)
+		FPCGExTask(PCGExData::FPointIO* InPointIO) : PointIO(InPointIO)
 		{
 		}
 
@@ -451,15 +451,15 @@ namespace PCGExMT
 		bool Checkpoint() const { return !(!Manager || !Manager->IsAvailable()); }
 
 		template <typename T, typename... Args>
-		void InternalStart(int32 TaskIndex, PCGExData::FPointIO* InPointsIO, Args... args)
+		void InternalStart(int32 InTaskIndex, PCGExData::FPointIO* InPointsIO, Args... args)
 		{
 			PCGEX_ASYNC_CHECKPOINT_VOID
-			if (!bIsAsync) { Manager->StartSynchronous<T>(TaskIndex, InPointsIO, args...); }
-			else { Manager->Start<T>(TaskIndex, InPointsIO, args...); }
+			if (!bIsAsync) { Manager->StartSynchronous<T>(InTaskIndex, InPointsIO, args...); }
+			else { Manager->Start<T>(InTaskIndex, InPointsIO, args...); }
 		}
 
 		template <typename T, typename... Args>
-		void InternalStartSync(int32 TaskIndex, PCGExData::FPointIO* InPointsIO, Args... args)
+		void InternalStartSync(int32 InTaskIndex, PCGExData::FPointIO* InPointsIO, Args... args)
 		{
 			PCGEX_ASYNC_CHECKPOINT_VOID
 			Manager->StartSynchronous<T>(TaskIndex, InPointsIO, args...);

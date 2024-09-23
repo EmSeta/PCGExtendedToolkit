@@ -58,6 +58,9 @@ namespace PCGExPointsMT
 
 	public:
 		FPointsProcessorBatchBase* ParentBatch = nullptr;
+    
+		template <typename T>
+		T* GetParentBatch() { return static_cast<T*>(ParentBatch); }
 
 		bool bIsProcessorValid = false;
 

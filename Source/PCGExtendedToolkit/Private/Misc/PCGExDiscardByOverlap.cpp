@@ -128,7 +128,7 @@ void FPCGExDiscardByOverlapContext::Prune()
 
 		UpdateMaxScores(Remaining);
 
-		for (PCGExDiscardByOverlap::FProcessor* C : Remaining) { C->UpdateWeight(MaxScores); }
+		for (PCGExDiscardByOverlap::FProcessor* C : Remaining) { C->UpdateWeightGetter(MaxScores); }
 	}
 }
 
