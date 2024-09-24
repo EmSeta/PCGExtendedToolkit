@@ -402,9 +402,9 @@ namespace PCGExMT
 	};
 	
 	/* [EmSeta]
-	Clang didn't like the redundant namespace qualification
+	Clang didn't like the redundant namespace qualification */
 	
-	class /*PCGEXTENDEDTOOLKIT_API#1# PCGExMT::FPCGExTask : public FNonAbandonableTask */
+	// class /*PCGEXTENDEDTOOLKIT_API#1# PCGExMT::FPCGExTask : public FNonAbandonableTask
 	class /*PCGEXTENDEDTOOLKIT_API*/ FPCGExTask : public FNonAbandonableTask
 	
 	/* [/EmSeta] */
