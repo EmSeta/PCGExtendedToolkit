@@ -58,9 +58,15 @@ namespace PCGExPointsMT
 
 	public:
 		FPointsProcessorBatchBase* ParentBatch = nullptr;
-    
+
+		
+		/* [EmSeta]
+		Templated function to work around ambiguation issues in clang */
+		
 		template <typename T>
 		T* GetParentBatch() { return static_cast<T*>(ParentBatch); }
+
+		/* [/EmSeta] */
 
 		bool bIsProcessorValid = false;
 

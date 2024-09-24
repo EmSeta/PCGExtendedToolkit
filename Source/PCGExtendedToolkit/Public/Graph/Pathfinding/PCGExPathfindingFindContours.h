@@ -206,35 +206,20 @@ namespace PCGExFindContours
 		virtual void ProcessSingleRangeIteration(int32 Iteration, const int32 LoopIdx, const int32 Count) override;
 		virtual void CompleteWork() override;
 
-		/** Public Getter Methods */
+		/** [EmSeta]
+		Created Public Getter Methods to avoid member access warnings/errors in clang */
+		
 		const UPCGExFindContoursSettings* GetLocalSettings() const { return LocalSettings; }
 		FPCGExFindContoursContext* GetLocalTypedContext() const { return LocalTypedContext; }
 		const TArray<FVector>* GetProjectedPositions() const { return ProjectedPositions; }
 		TArray<PCGExCluster::FExpandedNode*>* GetExpandedNodes() const { return ExpandedNodes; }
 		TArray<PCGExCluster::FExpandedEdge*>* GetExpandedEdges() const { return ExpandedEdges; }
-		// Getter for UniquePathsLock
-		FRWLock& GetUniquePathsLock() const
-		{
-			return UniquePathsLock;
-		}
-
-		// Getter for UniquePathsStartPairs
-		TSet<uint64>& GetUniquePathsStartPairs()
-		{
-			return UniquePathsStartPairs;
-		}
-
-		// Getter for UniquePathsBounds
-		TSet<uint32>& GetUniquePathsBounds()
-		{
-			return UniquePathsBounds;
-		}
-
-		// Getter for AsyncManagerPtr
-		PCGExMT::FTaskManager* GetAsyncManagerPtr() const
-		{
-			return AsyncManagerPtr;
-		}
+		FRWLock& GetUniquePathsLock() const { return UniquePathsLock; }
+		TSet<uint64>& GetUniquePathsStartPairs() { return UniquePathsStartPairs; }
+		TSet<uint32>& GetUniquePathsBounds() { return UniquePathsBounds; }
+		PCGExMT::FTaskManager* GetAsyncManagerPtr() const { return AsyncManagerPtr; }
+		
+		/** [/EmSeta] */
 
 		PCGExGraph::FGraphBuilder* GraphBuilder = nullptr;
 	};

@@ -128,7 +128,12 @@ void FPCGExDiscardByOverlapContext::Prune()
 
 		UpdateMaxScores(Remaining);
 
+		/** [EmSeta]
+		Changed from accessing members directly to using getters to resolve clang's access warning
+		for (PCGExDiscardByOverlap::FProcessor* C : Remaining) { C->UpdateWeight(MaxScores); } */
 		for (PCGExDiscardByOverlap::FProcessor* C : Remaining) { C->UpdateWeightGetter(MaxScores); }
+		/** [/EmSeta] */
+		
 	}
 }
 

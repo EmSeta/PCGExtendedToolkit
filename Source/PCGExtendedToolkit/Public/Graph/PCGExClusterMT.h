@@ -40,8 +40,11 @@ namespace PCGExClusterMT
 	};
 
 #pragma endregion
-
+	
+	/* [EmSeta]
+	added forward declaration to FClusterProcessorBatchBase as clang was accessing the wrong ParentBatch */
 	class FClusterProcessorBatchBase; 
+	/* [/EmSeta] */
 	
 	class FClusterProcessor
 	{
@@ -77,10 +80,16 @@ namespace PCGExClusterMT
 		}
 
 	public:
+		
+		/* [EmSeta]
+		Had some pretty weird access/ambiguation issues with ParentBatch – creating a templated function seems to have worked...
+		
+		FClusterProcessorBatchBase* ParentBatch = nullptr; */
 		PCGExClusterMT::FClusterProcessorBatchBase* ParentBatch = nullptr;
 		
 		template <typename T>
 		T* GetParentBatch() { return static_cast<T*>(ParentBatch); }
+		/* [EmSeta] */
 
 		PCGExData::FFacade* VtxDataFacade = nullptr;
 		PCGExData::FFacade* EdgeDataFacade = nullptr;

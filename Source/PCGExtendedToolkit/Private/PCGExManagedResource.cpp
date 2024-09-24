@@ -1,6 +1,11 @@
 ﻿// Copyright Timothé Lapetite 2024
 // Released under the MIT license https://opensource.org/license/MIT/
 
+/** [EmSeta]
+Removed preprocessor directive, clang doesn't like them in cpp files
+#pragma once
+[/EmSeta] */
+
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "PCGExManagedResource.h"

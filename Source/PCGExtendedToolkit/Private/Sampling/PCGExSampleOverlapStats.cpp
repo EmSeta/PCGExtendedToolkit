@@ -43,8 +43,16 @@ void FPCGExSampleOverlapStatsContext::MTState_PointsCompletingWorkDone()
 	for (PCGExSampleOverlapStats::FProcessor* P : TypedBatch->Processors)
 	{
 		if (!P->bIsProcessorValid) { continue; }
+		
+		/* [EmSeta]
+		Changed from accessing members directly to using getters to resolve clang's access warning
+		
+		SharedOverlapSubCountMax = FMath::Max(SharedOverlapSubCountMax, P->LocalOverlapSubCountMax);
+		SharedOverlapCountMax = FMath::Max(SharedOverlapCountMax, P->LocalOverlapCountMax); */
 		SharedOverlapSubCountMax = FMath::Max(SharedOverlapSubCountMax, P->GetLocalOverlapSubCountMax());
 		SharedOverlapCountMax = FMath::Max(SharedOverlapCountMax, P->GetLocalOverlapCountMax());
+		
+		/* [/EmSeta] */
 	}
 }
 

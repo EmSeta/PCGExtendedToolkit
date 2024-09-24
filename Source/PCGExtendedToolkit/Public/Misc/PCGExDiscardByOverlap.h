@@ -372,10 +372,10 @@ namespace PCGExDiscardByOverlap
 		virtual void CompleteWork() override;
 		virtual void Write() override;
 
-		void UpdateWeightGetter(const FPCGExOverlapScoresWeighting& InMax) 
-		{ 
-			UpdateWeight(InMax); 
-		}
+		/* [EmSeta]
+		Created Public Getter Method to avoid member access warnings/errors in clang */
+		void UpdateWeightGetter(const FPCGExOverlapScoresWeighting& InMax) { UpdateWeight(InMax); }
+		/* [/EmSeta] */
 
 	protected:
 		void UpdateWeightValues();

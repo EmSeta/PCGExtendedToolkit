@@ -30,19 +30,31 @@ PCGExData::EInit UPCGExFindContoursSettings::GetMainOutputInitMode() const { ret
 
 bool FPCGExFindContoursContext::TryFindContours(PCGExData::FPointIO* PathIO, const int32 SeedIndex, PCGExFindContours::FProcessor* ClusterProcessor)
 {
+	// [EmSeta]
+	// Changed from accessing member directly to using a getter to resolve clang's access warning
+	// const UPCGExFindContoursSettings* Settings = ClusterProcessor->LocalSettings;
 	const UPCGExFindContoursSettings* Settings = ClusterProcessor->GetLocalSettings();
+	// [/EmSeta]
 
 	PCGExCluster::FCluster* Cluster = ClusterProcessor->Cluster;
 
+	// [EmSeta]
+    // Changed from accessing members directly to using getters to resolve clang's access warning
+	// TArray<PCGExCluster::FExpandedNode*>* ExpandedNodes = ClusterProcessor->ExpandedNodes;
+	// TArray<PCGExCluster::FExpandedEdge*>* ExpandedEdges = ClusterProcessor->ExpandedEdges;
 	TArray<PCGExCluster::FExpandedNode*>* ExpandedNodes = ClusterProcessor->GetExpandedNodes();
 	TArray<PCGExCluster::FExpandedEdge*>* ExpandedEdges = ClusterProcessor->GetExpandedEdges();
 
+	// const TArray<FVector>& Positions = *ClusterProcessor->ProjectedPositions;
 	const TArray<FVector>& Positions = *ClusterProcessor->GetProjectedPositions();
+	
 	const TArray<PCGExCluster::FNode>& NodesRef = *Cluster->Nodes;
 
+	//	const FVector Guide = ClusterProcessor->LocalTypedContext->ProjectionDetails.Project(ClusterProcessor->LocalTypedContext->SeedsDataFacade->Source->GetInPoint(SeedIndex).Transform.GetLocation(), SeedIndex);
 	const FVector Guide = ClusterProcessor->GetLocalTypedContext()->ProjectionDetails.Project(ClusterProcessor->GetLocalTypedContext()->SeedsDataFacade->Source->GetInPoint(SeedIndex).Transform.GetLocation(), SeedIndex);
 	int32 StartNodeIndex = Cluster->FindClosestNode(Guide, Settings->SeedPicking.PickingMethod, 2);
 	int32 NextEdge = Cluster->FindClosestEdge(StartNodeIndex, Guide);
+	// [/EmSeta]
 
 	FBox PathBox = FBox(ForceInit);
 
@@ -86,8 +98,13 @@ bool FPCGExFindContoursContext::TryFindContours(PCGExData::FPointIO* PathIO, con
 		uint64 StartHash = PCGEx::H64(PrevIndex, NextIndex);
 		bool bAlreadyExists;
 		{
+			// [EmSeta]
+			// Changed from accessing members directly to using getters to resolve clang's access warning
+			// FWriteScopeLock WriteScopeLock(ClusterProcessor->UniquePathsLock);
+			// ClusterProcessor->UniquePathsBounds.Add(BoxHash, &bAlreadyExists);
 			FWriteScopeLock WriteScopeLock(ClusterProcessor->GetUniquePathsLock());
 			ClusterProcessor->GetUniquePathsStartPairs().Add(StartHash, &bAlreadyExists);
+			// [/EmSeta]
 		}
 		if (bAlreadyExists) { return false; }
 	}
@@ -223,7 +240,12 @@ bool FPCGExFindContoursContext::TryFindContours(PCGExData::FPointIO* PathIO, con
 		PCGEx::TAttributeWriter<bool>* DeadEndWriter = new PCGEx::TAttributeWriter<bool>(Settings->DeadEndAttributeName, false, false, true);
 		DeadEndWriter->BindAndSetNumUninitialized(PathIO);
 		for (int i = 0; i < Path.Num(); ++i) { DeadEndWriter->Values[i] = (Cluster->Nodes->GetData() + Path[i])->Adjacency.Num() == 1; }
+
+		/**  [EmSeta]
+		Changed from accessing members directly to using getters to resolve clang's access warning
+		PCGEX_ASYNC_WRITE_DELETE(ClusterProcessor->AsyncManagerPtr, DeadEndWriter) */
 		PCGEX_ASYNC_WRITE_DELETE(ClusterProcessor->GetAsyncManagerPtr(), DeadEndWriter)
+		/** [/EmSeta] */
 	}
 
 	if (Sign != 0)
@@ -232,10 +254,17 @@ bool FPCGExFindContoursContext::TryFindContours(PCGExData::FPointIO* PathIO, con
 		if (Settings->bTagConvex && bIsConvex) { PathIO->Tags->Add(Settings->ConvexTag); }
 	}
 
+	/** [EmSeta]
+	Changed from accessing members directly to using getters to resolve clang's access warning */
+	
+	// PathDataFacade->Write(ClusterProcessor->AsyncManagerPtr, true); 
 	PathDataFacade->Write(ClusterProcessor->GetAsyncManagerPtr(), true);
 	PCGEX_DELETE(PathDataFacade)
 
+	// if (Settings->bOutputFilteredSeeds) { ClusterProcessor->LocalTypedContext->SeedQuality[SeedIndex] = true; }
 	if (Settings->bOutputFilteredSeeds) { ClusterProcessor->GetLocalTypedContext()->SeedQuality[SeedIndex] = true; }
+
+	/** [/EmSeta] */
 
 	return true;
 }

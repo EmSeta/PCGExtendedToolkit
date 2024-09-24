@@ -400,8 +400,15 @@ namespace PCGExMT
 
 		void OnTaskCompleted();
 	};
-
+	
+	/* [EmSeta]
+	Clang didn't like the redundant namespace qualification
+	
+	class /*PCGEXTENDEDTOOLKIT_API#1# PCGExMT::FPCGExTask : public FNonAbandonableTask */
 	class /*PCGEXTENDEDTOOLKIT_API*/ FPCGExTask : public FNonAbandonableTask
+	
+	/* [/EmSeta] */
+	
 	{
 		friend class FTaskManager;
 		friend class FTaskGroup;
@@ -425,9 +432,13 @@ namespace PCGExMT
 #define PCGEX_ASYNC_CHECKPOINT_VOID  if (!Checkpoint()) { return; }
 #define PCGEX_ASYNC_CHECKPOINT  if (!Checkpoint()) { return false; }
 
+		/* [EmSeta]
+		Removed redundant namespace qualification
+		PCGExMT::FPCGExTask(PCGExData::FPointIO* InPointIO) : PointIO(InPointIO) */
 		FPCGExTask(PCGExData::FPointIO* InPointIO) : PointIO(InPointIO)
 		{
 		}
+		/* [/EmSeta] */
 
 		FORCEINLINE TStatId GetStatId() const
 		{
@@ -450,20 +461,30 @@ namespace PCGExMT
 		bool bWorkDone = false;
 		bool Checkpoint() const { return !(!Manager || !Manager->IsAvailable()); }
 
+		/* [EmSeta]
+		Clang didn't like the ambiguity of TaskIndex */
+		
 		template <typename T, typename... Args>
+		
+		// void InternalStart(int32 TaskIndex, PCGExData::FPointIO* InPointsIO, Args... args)
 		void InternalStart(int32 InTaskIndex, PCGExData::FPointIO* InPointsIO, Args... args)
 		{
 			PCGEX_ASYNC_CHECKPOINT_VOID
+			// if (!bIsAsync) { Manager->StartSynchronous<T>(TaskIndex, InPointsIO, args...); }
+			// else { Manager->Start<T>(TaskIndex, InPointsIO, args...); }
 			if (!bIsAsync) { Manager->StartSynchronous<T>(InTaskIndex, InPointsIO, args...); }
 			else { Manager->Start<T>(InTaskIndex, InPointsIO, args...); }
 		}
 
 		template <typename T, typename... Args>
+
+		// void InternalStartSync(int32 TaskIndex, PCGExData::FPointIO* InPointsIO, Args... args) */
 		void InternalStartSync(int32 InTaskIndex, PCGExData::FPointIO* InPointsIO, Args... args)
 		{
 			PCGEX_ASYNC_CHECKPOINT_VOID
 			Manager->StartSynchronous<T>(TaskIndex, InPointsIO, args...);
 		}
+		/* [/EmSeta] */
 	};
 
 	class FGroupRangeCallbackTask : public FPCGExTask
